@@ -1,15 +1,366 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dactylorhiza Determination Tool</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Dactylorhiza Bestimmungstool</title>
+    <style>
+        body { background-color: #f0f2f0; margin: 0; padding: 10px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        #dactylorhiza-app { max-width: 850px; margin: 20px auto; color: #333; line-height: 1.6; }
+        #orch-content { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2e7d32; margin-top: 0; font-size: 1.5rem; }
+        h4 { color: #444; margin: 20px 0 15px 0; font-size: 1.1rem; }
+
+        .radio-option, .matrix-option { display: flex; align-items: center; padding: 12px; margin: 10px 0; border: 1px solid #eee; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .radio-option:hover, .matrix-option:hover { background: #f9f9f9; border-color: #ccc; }
+        .radio-option input, .matrix-option input { margin-right: 12px; transform: scale(1.2); cursor: pointer; }
+        
+        .question-img-container { margin: 15px 0; }
+        .question-img { 
+            display: block; 
+            max-width: 400px; 
+            width: 100%;
+            height: auto; 
+            border-radius: 4px; 
+            border: 1px solid #ddd;
+        }
+        .img-caption { display: block; font-size: 0.85rem; color: #666; margin-top: 5px; font-style: italic; }
+
+        .btn-next, .btn-restart, .btn-exit, .btn-back, .btn-reset-inline { 
+            padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: opacity 0.2s; 
+        }
+        .btn-next { background: #2e7d32; color: #fff; }
+        .btn-restart { background: #1976d2; color: #fff; }
+        .btn-exit { background: #d32f2f; color: #fff; }
+        .btn-back { background: #757575; color: #fff; }
+        .btn-reset-inline { background: #ffa000; color: #fff; }
+        
+        button:hover { opacity: 0.9; }
+        #orch-nav { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid #eee; padding-top: 20px; }
+
+        .matrix-area { display: flex; flex-direction: column; gap: 20px; margin-bottom: 25px; }
+        .matrix-group { border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .matrix-group strong { display: block; margin-bottom: 8px; color: #2e7d32; }
+
+        .result-item-box { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .result-perc { font-weight: bold; color: #2e7d32; font-size: 1.2rem; }
+        .low-info { margin: 15px 0; color: #666; font-style: italic; font-size: 0.95rem; }
+    </style>
 </head>
 <body>
-    <h1>Dactylorhiza Determination Tool</h1>
-    <img src="/images/image1.jpg" alt="Dactylorhiza Image 1">
-    <img src="/images/image2.jpg" alt="Dactylorhiza Image 2">
-    <!-- Include more content as necessary -->
+
+<div id="dactylorhiza-app">
+    <div id="orch-content"></div>
+</div>
+
+<script>
+(function() {
+    const wpBase = "https://orchideensucher.wordpress.com/wp-content/uploads/2026/03/";
+
+    function getImg(fileName, caption = "") {
+        return `<div class='question-img-container'>
+                    <img src='${wpBase}${fileName}' 
+                         onerror="this.onerror=null; this.src='${fileName}';" 
+                         class='question-img'>
+                    ${caption ? `<span class='img-caption'>${caption}</span>` : ""}
+                </div>`;
+    }
+
+    const speciesMap = {
+        "01": "eine Grüne Hohlzunge (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:998314-1' target='_blank' style='color: inherit;'>Dactylorhiza viridis</a>)",
+        "02": "die gelbe Varietät der Holunder-Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:626671-1' target='_blank' style='color: inherit;'>Dactylorhiza sambucina</a>)",
+        "03": "eine Strohgelbe Fingerwurz, die blaßgelbe Unterart der Fleischfarbenen Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:50982655-1' target='_blank' style='color: inherit;'>Dactylorhiza incarnata ochroleuca</a>)",
+        "04": "die purpurfarbene Varietät der Holunder-Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:626671-1' target='_blank' style='color: inherit;'>Dactylorhiza sambucina</a>)",
+        "05": "eine Fleischfarbene Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77168087-1' target='_blank' style='color: inherit;'>Dactylorhiza incarnata incarnata</a>)",
+        "06": "eine alpine Varietät der Fleischfarbenen Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77285376-1' target='_blank' style='color: inherit;'>Dactylorhiza incarnata incarnata Var. hyphaematodes</a>)",
+        "07": "eine Blutrote Fingerwurz, eine Unterart der Fleischfarbenen Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77189617-1' target='_blank' style='color: inherit;'>Dactylorhiza incarnata cruenta</a>)",
+        "08": "eine Breitblättrige Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77168082-1' target='_blank' style='color: inherit;'>Dactylorhiza majalis majalis</a>)",
+        "09": "eine Alpen-Fingerwurz, eine alpine Varietät der Breitblättrigen Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77256427-1' target='_blank' style='color: inherit;'>Dactylorhiza majalis majalis Var. alpestris</a>)",
+        "10": "eine Kleinfleckige Fingerwurz, eine zierliche Varietät der Breitblättrigen Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:1018388-1' target='_blank' style='color: inherit;'>Dactylorhiza majalis majalis Var. parvimajalis</a>)",
+        "11": "Ruthes Fingerwurz, auch Dactylorhiza × kerneriorum, eine stabilisierte Hybride aus D. fuchsii und D. incarnata incarnata (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77168079-1' target='_blank' style='color: inherit;'>Dactylorhiza majalis ruthei</a>)",
+        "12": "eine Übersehene Fingerwurz, eine westeuropäische Unterart der Breitblättrigen Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:887444-1' target='_blank' style='color: inherit;'>Dactylorhiza majalis praetermissa</a>)",
+        "13": "eine Ringfleckige Fingerwurz, eine Varietät der Übersehenen Fingerwurz, auch Leoparden-Orchis (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:995220-1' target='_blank' style='color: inherit;'>Dactylorhiza majalis praetermissa Var. junialis</a>)",
+        "14": "eine Torfmoos-Fingerwurz, eine Unterart der Breitblättrigen Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:60434236-2' target='_blank' style='color: inherit;'>Dactylorhiza majalis sphagnicola</a>)",
+        "15": "Traunsteiners Fingerwurz, auch Lappländische Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:887435-1' target='_blank' style='color: inherit;'>Dactylorhiza traunsteineri</a>)",
+        "16": "eine Savoyer Fingerwurz, eine Varietät der Gefleckten Fingerwurz aus den West-Alpen (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77065121-1' target='_blank' style='color: inherit;'>Dactylorhiza maculata maculata Var. savogiensis</a>)",
+        "17": "eine Gefleckte Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77168086-1' target='_blank' style='color: inherit;'>Dactylorhiza maculata maculata</a>)",
+        "18": "eine Fuchs'sche Fingerwurz (<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:626606-1' target='_blank' style='color: inherit;'>Dactylorhiza fuchsii</a>)"
+    };
+
+    const questionGroups = [
+        { label: "Wieviele Laubblätter hat die Pflanze?", indices: [0, 1, 2, 3, 4, 5, 6, 7] },
+        { label: "Wo setzen die Laubblätter an?", indices: [8, 9] },
+        { label: "Wie sehen die Laubblätter im Umriss aus?<br>" + getImg('lbbllanzet.jpg'), indices: [10, 11, 12] },
+        { label: "Sind die Laubblätter im Querschnitt deutlich gefaltet?<br>" + getImg('lbblgefaltet.jpg'), indices: [13, 14] },
+        { label: "Sind die Laubblätter gefleckt?", indices: [15, 16, 17] },
+        { label: "Sehen Sie sich das unterste Laubblatt an. Ist es eher...<br>" + getImg('laubblatt.jpg'), indices: [18, 19] },
+        { label: "Sehen Sie sich die Tragblätter an. Überragen zumindest einige die Blüten?<br>" + getImg('tragblatt.jpg'), indices: [20, 21] },
+        { label: "Drücken Sie (vorsichtig!) im oberen Teil auf den Stängel. Ist er...", indices: [22, 23] },
+        { label: "Betrachten Sie den Blütenstand. Ist er eher...", indices: [24, 25] },
+        { label: "Wieviele Blüten hat der Blütenstand?", indices: [26, 27, 28] },
+        { label: "Sind die seitlichen Sepalen eher nach hinten/aufwärts gerichtet?<br>" + getImg('sepalen.jpg'), indices: [29, 30] },
+        { label: "Sind die seitlichen Sepalen gefleckt?", indices: [31, 32] },
+        { label: "Ist die Lippe flächig oder gefaltet?<br>" + getImg('lippeflaeche.jpg'), indices: [33, 34, 35] },
+        { label: "Ist die Lippe dreilappig?<br>" + getImg('lippe.jpg'), indices: [36, 37, 38] },
+        { label: "Ist der Mittellappen der Lippe nach vorn gezogen?<br>" + getImg('mittellappen.jpg'), indices: [39, 40, 41] },
+        { label: "Welche Form hat der Sporn?<br>" + getImg('sporn.jpg'), indices: [42, 43] },
+        { label: "Wie ist der Sporn ausgerichtet?", indices: [44, 45] },
+        { label: "Wo haben Sie die Pflanze gefunden (Habitat)?", indices: [46, 47] }
+    ];
+
+    const rawAnswers = ["3","4","5","6","7","8","9","10","Fast alle im unteren Drittel des Stängels.","Eher über den Stängel verteilt.","Die Mehrzahl ist breit lanzettlich.","Die Mehrzahl ist eher schmal.","Sie sind etwa zu gleichen Teilen breit lanzettlich und schmal.","...ohne Faltung oder höchstens rinnig gekielt?","...deutlich gefaltet?","Ja, mit runden oder ovalen Punkten.","Ja, mit kleinen Kreisen (\"Leopardenmuster\").","Nein.","rundlich eiförmig?","eher breit lanzettlich?","Ja.","Nein.","...markig?","...hohl?","dichtblütig","lockerblütig","unter 20","zwischen 21 und 30","mehr als 30","...nach hinten oben gerichtet?","...eher seitlich nach vorn gerichtet?","Ja.","Nein.","...flächig?","...gefaltet mit nach hinten gebogenen Seitenrändern?","...gefaltet mit nach vorn gebogenen Seitenrändern?","Ja, tief gekerbt.","Ja, deutlich gekerbt","Nein, höchstens schwach gekerbt.","deutlich","nur leicht","nein","Eher zylindrisch.","Eher kegelförmig.","Eher waagerecht","Eher abwärts gerichtet oder nach unten gebogen.","An einem eher trockenen Standort.","An einem feuchten Standort (Wasseraustritt, Feuchtwiese, Sumpf, Moor)."];
+
+    const matrixData = [
+        { id: "08", scores: ["nein","ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","nein","ja","ja","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein","ja","ja","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","nein","ja","nein","ja"] },
+        { id: "09", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","nein","ja","nein","nein","ja","ja","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein","ja","ja","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","nein","nein","ja","nein","ja","ja","ja","nein","nein","ja"] },
+        { id: "10", scores: ["nein","ja","ja","nein","nein","nein","nein","nein","nein","ja","nein","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja","ja","nein","ja","nein","ja"] },
+        { id: "11", scores: ["nein","nein","ja","ja","ja","nein","nein","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein","nein","ja","nein","ja","ja","nein","ja","ja","ja","nein","ja","nein","ja","ja","nein","nein","ja","ja","nein","nein","nein","nein","ja","nein","nein","ja","nein","ja"] },
+        { id: "12", scores: ["nein","nein","ja","ja","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","nein","nein","nein","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja"] },
+        { id: "13", scores: ["nein","nein","ja","ja","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","nein","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein"] },
+        { id: "14", scores: ["nein","ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","ja","nein","nein","ja","ja","nein","ja","ja","ja","ja","nein","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja"] },
+        { id: "15", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","nein","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","ja","ja","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","nein","ja","nein","nein","ja","nein","nein","ja","center","ja","ja","ja","ja","nein","ja"] },
+        { id: "16", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","nein","ja","ja","nein","nein","nein","ja","ja","nein","nein","nein","nein","ja","ja","nein","ja","nein","ja","ja","nein","nein","ja","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja","ja","ja","nein","nein","ja"] },
+        { id: "17", scores: ["nein","ja","ja","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","ja","nein","nein","nein","ja","nein","ja","ja","nein","ja","nein","ja","ja","ja","nein","ja","nein","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein"] },
+        { id: "18", scores: ["nein","nein","ja","ja","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein","ja","nein","ja","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","nein","ja","nein"] }
+    ];
+
+    let history = [];
+
+    function render(pageId, data = null) {
+        const content = document.getElementById('orch-content');
+        content.innerHTML = '';
+        history.push(pageId);
+
+        switch (pageId) {
+            case 'start':
+                content.innerHTML = '<h2>Herzlich Willkommen!</h2><p>Herzlich Willkommen zum Online-Bestimmungstool für die Dactylorhiza-Arten Mitteleuropas! Bitte beantworten Sie die nachfolgenden Fragen.</p>';
+                createActionRow(content, "Bestimmung starten", () => render('grundfarbe'));
+                break;
+            case 'grundfarbe':
+                showStep(content, "Bitte sehen Sie sich die einzelnen Blüten Ihrer Orchidee an! Welche Grundfarbe haben sie?", [
+                    { t: "Die Blüte ist grün, ggf. mit rotbraun überlaufenen Partien.", n: () => render('result', '01|DIRECT|0') },
+                    { t: "Die Blüte ist gelb.", n: () => render('pageA') },
+                    { t: "Die Blüte ist rosa bis tief violett.", n: () => render('pageB') }
+                ]);
+                break;
+            case 'pageA':
+                showStep(content, "Bitte sehen Sie sich die Lippe der Blüten an!<br>" + getImg('sambucinadots.jpg'), [
+                    { t: "In der Mitte der Lippe finden sich einzelne rote Punkte, selten auch angedeutete Schleifen. Die Pflanze steht an einem eher trockenen Standort", n: () => render('result', '02|DIRECT|0') },
+                    { t: "Auf der Lippe sind keine solchen Punkte zu finden. Der Standort ist eher feucht bis nass.", n: () => render('result', '03|DIRECT|0') }
+                ]);
+                break;
+            case 'pageB':
+                showStep(content, "Bitte sehen Sie sich die Lippe der Blüten an!<br>" + getImg('sambucinalilac.jpg'), [
+                    { t: "Die Mitte der Lippe ist gelblich, ggf. mit einzelnen roten Punkten, selten auch mit angedeuteten Schleifen. Die Pflanze steht an einem eher trockenen Standort.", n: () => render('result', '04|DIRECT|0') },
+                    { t: "Die Lippe ist anders.", n: () => render('pageC') }
+                ]);
+                break;
+            case 'pageC':
+                showStep(content, "Bitte sehen Sie sich die Laubblätter Ihrer Orchidee an!<br>" + getImg('incarnatakap.jpg', 'Kapuze'), [
+                    { t: "Sie sind längs gefaltet, stehen aufrecht, mindestens das oberste ragt in den Blütenstand deutlich hinein. Ihre Spitzen ähneln einer kleinen Kapuze.", n: () => render('pageD') },
+                    { t: "Sie reichen höchstens knapp an den Blütenstand heran. Ihre Spitzen haben keine Kapuze.", n: () => render('pageE') }
+                ]);
+                break;
+            case 'pageD':
+                showStep(content, "Haben die Laubblätter eine Zeichnung?", [
+                    { t: "Sie haben weder Flecken noch Striche.", n: () => render('result', '05|DIRECT|0') },
+                    { t: "Sie haben beidseitig eine feine dunkle Strichzeichnung entlang der Blattadern.", n: () => render('result', '06|DIRECT|0') },
+                    { t: "Ober- und die Unterseite sind rotbraun oder schwarz punktiert.", n: () => render('result', '07|DIRECT|0') }
+                ]);
+                break;
+            case 'pageE':
+                showStep(content, "Wo haben Sie die Pflanze gefunden (Geographie)?", [
+                    { t: "In Schleswig-Holstein, Hamburg, Bremen oder Mecklenburg-Vorpommern", n: () => render('Nord0') },
+                    { t: "In Hessen, Thüringen, Sachsen-Anhalt, Brandenburg oder Sachsen", n: () => render('Ost') },
+                    { t: "In Niedersachsen oder Nordrhein-Westfalen", n: () => render('West') },
+                    { t: "In Rheinland-Pfalz oder im Saarland", n: () => render('Suedwest') },
+                    { t: "In Bayern oder Baden-Württemberg oder in Österreich", n: () => render('Austria0') },
+                    { t: "In der Schweiz", n: () => render('Suisse0') }
+                ]);
+                break;
+            case 'Nord0': showStep(content, "Haben Sie die Pflanze auf der Insel Helgoland gefunden?", [{ t: "Ja", n: () => render('praetermissa') }, { t: "Nein", n: () => render('Nord1') }]); break;
+            case 'Nord1': showStep(content, "Haben Sie die Pflanze auf der Insel Usedom gefunden?", [{ t: "Ja", n: () => render('Nord2') }, { t: "Nein", n: () => render('Nord') }]); break;
+            case 'praetermissa': showStep(content, "Haben die Blätter dunkle, ringförmige Flecken (Leopardenmuster)?", [{ t: "Ja.", n: () => render('result', '13|LEO|0') }, { t: "Die Blätter sind ungefleckt", n: () => render('result', '12|DIRECT|0') }]); break;
+            case 'Nord2': runMatrix(content, ['08','11','12','13','14','18']); break;
+            case 'Nord': runMatrix(content, ['08','12','13','14','18']); break;
+            case 'Ost': runMatrix(content, ['08','18']); break;
+            case 'West': runMatrix(content, ['08','12','13','14','17','18']); break;
+            case 'Suedwest': runMatrix(content, ['08','12','13','14','15','18']); break;
+            case 'Austria0': case 'Suisse0': showStep(content, "Auf welcher Höhe über der Meeresspiegel haben Sie die Pflanze gefunden?", [{ t: "Über 2200 m", n: () => render('Hoch') }, { t: "Unter 2200 m", n: () => render(pageId==='Austria0'?'Austria':'Suisse') }]); break;
+            case 'Hoch': runMatrix(content, ['09','18']); break;
+            case 'Austria': runMatrix(content, ['08','09','10','15','18']); break;
+            case 'Suisse': runMatrix(content, ['08','09','10','15','16','17','18']); break;
+            
+            case 'result':
+                content.innerHTML = `<h3>Ergebnis:</h3>`;
+                const resParts = data.split('|');
+                const ids = resParts[0].split(',');
+                const type = resParts[1];
+
+                let displayNames = ids.map(id => speciesMap[id]).join(' oder ');
+
+                if (type === 'LEO') {
+                    content.innerHTML += `<div class="result-item-box"><span>Sie haben <strong>${speciesMap["13"]}</strong> vor sich.</span></div>`;
+                } else if (type === 'DIRECT') {
+                    content.innerHTML += `<div class="result-item-box"><span>Sie haben <strong>${displayNames}</strong> vor sich.</span></div>`;
+                } else if (type === 'LOW') {
+                    content.innerHTML += `<div class="result-item-box"><span>Sie haben wahrscheinlich <strong>${displayNames}</strong> vor sich.</span></div>`;
+                    content.innerHTML += `<p class="low-info">Für ein besseres Ergebnis sollten Sie versuchen, im vorherigen Dialog mehr Fragen zu beantworten.</p>`;
+                } else {
+                    content.innerHTML += `
+                        <div class="result-item-box">
+                            <span>Sie haben wahrscheinlich <strong>${displayNames}</strong> vor sich.</span>
+                            <span class="result-perc">${type}%</span>
+                        </div>`;
+                }
+
+                const restartBtn = document.createElement('button');
+                restartBtn.innerText = "Bestimmung neu beginnen";
+                restartBtn.className = "btn-restart";
+                restartBtn.style.marginTop = "20px";
+                restartBtn.onclick = () => { history = []; render('start'); };
+                content.appendChild(restartBtn);
+                break;
+        }
+
+        if (pageId !== 'start') {
+            addNavigation(content);
+        }
+    }
+
+    function showStep(cont, title, opts) {
+        cont.innerHTML += `<h4>${title}</h4>`;
+        opts.forEach((o, i) => {
+            const lbl = document.createElement('label');
+            lbl.className = "radio-option";
+            lbl.innerHTML = `<input type="radio" name="step-choice" value="${i}"> <span>${o.t}</span>`;
+            cont.appendChild(lbl);
+        });
+        createActionRow(cont, "Weiter", () => {
+            const selected = document.querySelector('input[name="step-choice"]:checked');
+            if (selected) opts[selected.value].n();
+            else alert("Bitte wählen Sie eine Option aus.");
+        });
+    }
+
+    function runMatrix(cont, allowedIds) {
+        cont.innerHTML = '<h4>Bitte beantworten Sie möglichst viele der folgenden Fragen:</h4>';
+        const qWrap = document.createElement('div');
+        qWrap.className = "matrix-area";
+        questionGroups.forEach((group, gIdx) => {
+            const gDiv = document.createElement('div');
+            gDiv.className = "matrix-group";
+            gDiv.innerHTML = `<strong>${group.label}</strong>`;
+            group.indices.forEach(idx => {
+                const lbl = document.createElement('label');
+                lbl.className = "matrix-option";
+                lbl.innerHTML = `<input type="radio" name="g${gIdx}" value="${idx}"> <span>${rawAnswers[idx]}</span>`;
+                gDiv.appendChild(lbl);
+            });
+            qWrap.appendChild(gDiv);
+        });
+        cont.appendChild(qWrap);
+
+        createActionRow(cont, "Weiter", () => {
+            let totalAnswered = 0;
+            let forceLeopard = false;
+
+            questionGroups.forEach((g, i) => { 
+                const sel = document.querySelector(`input[name="g${i}"]:checked`);
+                if(sel) {
+                    totalAnswered++;
+                    if(sel.value === "16") forceLeopard = true;
+                }
+            });
+            
+            if(totalAnswered === 0) { alert("Bitte wählen Sie mindestens ein Merkmal."); return; }
+
+            if(forceLeopard) {
+                render('result', '13|LEO|0'); 
+                return;
+            }
+
+            let results = [];
+            // FILTER AKTIVIERT: Nur Arten in allowedIds einbeziehen
+            matrixData.forEach(row => {
+                if (allowedIds.includes(row.id)) {
+                    let score = 0;
+                    questionGroups.forEach((group, gIdx) => {
+                        const sel = document.querySelector(`input[name="g${gIdx}"]:checked`);
+                        if (sel) {
+                            const ansIdx = parseInt(sel.value);
+                            if (row.scores[ansIdx] === 'ja') {
+                                // Gewichtung: unterstes Laubblatt (Index 5) und Stängel (Index 7) zählen doppelt
+                                let weight = (gIdx === 5 || gIdx === 7) ? 2 : 1;
+                                score += weight;
+                            }
+                        }
+                    });
+                    
+                    let percentNum = Math.round((score / 18) * 100);
+                    results.push({ id: row.id, score: score, percent: percentNum });
+                }
+            });
+
+            if (results.length === 0) {
+                alert("Keine passende Art in dieser Region gefunden.");
+                return;
+            }
+
+            results.sort((a, b) => b.score - a.score);
+            
+            if (totalAnswered < 10) {
+                const topScore = results[0].score;
+                const tiedIds = results.filter(r => r.score === topScore).map(r => r.id);
+                render('result', tiedIds.join(',') + '|LOW|' + totalAnswered);
+            } else {
+                const maxScore = results[0].score;
+                const winners = results.filter(r => r.score === maxScore);
+                const winnerIds = winners.map(w => w.id).join(',');
+                render('result', winnerIds + '|' + winners[0].percent + '|' + totalAnswered);
+            }
+        }, true);
+    }
+
+    function createActionRow(parent, nextText, action, withReset = false) {
+        const row = document.createElement('div');
+        row.style.display = "flex"; row.style.gap = "10px"; row.style.marginTop = "20px"; row.style.flexWrap = "wrap";
+        if (withReset) {
+            const resetBtn = document.createElement('button');
+            resetBtn.innerText = "Auswahl komplett zurücksetzen";
+            resetBtn.className = "btn-reset-inline";
+            resetBtn.onclick = () => document.querySelectorAll('.matrix-area input').forEach(r => r.checked = false);
+            row.appendChild(resetBtn);
+        }
+        const b = document.createElement('button');
+        b.innerText = nextText; b.className = "btn-next";
+        b.onclick = action;
+        row.appendChild(b);
+        parent.appendChild(row);
+    }
+
+    function addNavigation(parent) {
+        const nav = document.createElement('div');
+        nav.id = "orch-nav";
+        
+        const backBtn = document.createElement('button');
+        backBtn.innerText = "zurück zum vorherigen Dialog";
+        backBtn.className = "btn-back";
+        backBtn.onclick = () => { history.pop(); render(history.pop()); };
+        nav.appendChild(backBtn);
+
+        const exitBtn = document.createElement('button');
+        exitBtn.innerText = "Bestimmungstool verlassen";
+        exitBtn.className = "btn-exit";
+        exitBtn.onclick = () => window.location.href = "https://orchideensucher.wordpress.com/orchideen/bestimmungshilfe/";
+        nav.appendChild(exitBtn);
+
+        parent.appendChild(nav);
+    }
+
+    render('start');
+})();
+</script>
+
 </body>
 </html>
