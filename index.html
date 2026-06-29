@@ -111,16 +111,16 @@
     const rawAnswers = ["3","4","5","6","7","8","9","10","Fast alle im unteren Drittel des Stängels.","Eher über den Stängel verteilt.","Die Mehrzahl ist breit lanzettlich.","Die Mehrzahl ist eher schmal.","Sie sind etwa zu gleichen Teilen breit lanzettlich und schmal.","...ohne Faltung oder höchstens rinnig gekielt?","...deutlich gefaltet?","Ja, mit runden oder ovalen Punkten.","Ja, mit kleinen Kreisen (\"Leopardenmuster\").","Nein.","rundlich eiförmig?","eher breit lanzettlich?","Ja.","Nein.","...markig?","...hohl?","dichtblütig","lockerblütig","unter 20","zwischen 21 und 30","mehr als 30","...nach hinten oben gerichtet?","...eher seitlich nach vorn gerichtet?","Ja.","Nein.","...flächig?","...gefaltet mit nach hinten gebogenen Seitenrändern?","...gefaltet mit nach vorn gebogenen Seitenrändern?","Ja, tief gekerbt.","Ja, deutlich gekerbt","Nein, höchstens schwach gekerbt.","deutlich","nur leicht","nein","Eher zylindrisch.","Eher kegelförmig.","Eher waagerecht","Eher abwärts gerichtet oder nach unten gebogen.","An einem eher trockenen Standort.","An einem feuchten Standort (Wasseraustritt, Feuchtwiese, Sumpf, Moor)."];
 
     const matrixData = [
-        { id: "08", scores: ["nein","ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","nein","ja","ja","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein","ja","ja","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","nein","ja","nein","ja"] },
-        { id: "09", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","nein","ja","nein","nein","ja","ja","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein","ja","ja","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","nein","nein","ja","nein","ja","ja","ja","nein","nein","ja"] },
-        { id: "10", scores: ["nein","ja","ja","nein","nein","nein","nein","nein","nein","ja","nein","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja","ja","nein","ja","nein","ja"] },
-        { id: "11", scores: ["nein","nein","ja","ja","ja","nein","nein","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein","nein","ja","nein","ja","ja","nein","ja","ja","ja","nein","ja","nein","ja","ja","nein","nein","ja","ja","nein","nein","nein","nein","ja","nein","nein","ja","nein","ja"] },
-        { id: "12", scores: ["nein","nein","ja","ja","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","nein","nein","nein","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja"] },
-        { id: "13", scores: ["nein","nein","ja","ja","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","nein","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein"] },
-        { id: "14", scores: ["nein","ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","ja","nein","nein","ja","ja","nein","ja","ja","ja","ja","nein","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja"] },
-        { id: "15", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","nein","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","ja","ja","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","nein","ja","nein","nein","ja","nein","nein","ja","center","ja","ja","ja","ja","nein","ja"] },
-        { id: "16", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","nein","ja","ja","nein","nein","nein","ja","ja","nein","nein","nein","nein","ja","ja","nein","ja","nein","ja","ja","nein","nein","ja","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","nein","ja","ja","ja","nein","nein","ja"] },
-        { id: "17", scores: ["nein","ja","ja","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","ja","nein","nein","nein","ja","nein","ja","ja","nein","ja","nein","ja","ja","ja","nein","ja","nein","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","ja","nein","nein","ja","ja","nein"] },
+        { id: "08", scores: ["ja","ja","ja","ja","nein","nein","nein","nein","nein","ja","ja","nein","ja","ja","nein","ja","nein","nein","nein","ja","ja","nein","nein","ja","ja","ja","ja","ja","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","nein","ja","ja","ja","nein","ja","nein","ja","nein","ja"] },
+        { id: "09", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","nein","ja","ja","nein","ja","ja","nein","ja","nein","nein","nein","ja","ja","nein","nein","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","ja","ja","nein","nein","nein","ja","nein","ja","ja","nein","ja","nein","ja","ja","ja"] },
+        { id: "10", scores: ["nein","ja","ja","nein","nein","nein","nein","nein","nein","ja","nein","ja","nein","ja","nein","ja","nein","nein","nein","ja","ja","nein","nein","ja","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja","ja","nein","ja","nein","ja","nein","ja"] },
+        { id: "11", scores: ["nein","nein","ja","ja","ja","nein","nein","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein","nein","ja","nein","ja","ja","nein","ja","ja","ja","nein","ja","nein","ja","ja","nein","nein","ja","ja","nein","nein","nein","nein","ja","ja","nein","ja","nein","ja"] },
+        { id: "12", scores: ["nein","nein","ja","ja","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","nein","nein","nein","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","nein","ja","nein","nein","nein","ja","nein","ja","nein","ja"] },
+        { id: "13", scores: ["nein","nein","ja","ja","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","nein","ja","ja","nein","nein","ja","ja","nein","nein","ja","ja","ja","nein","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","nein","nein","ja","nein","nein","nein","ja","nein","ja","nein","ja"] },
+        { id: "14", scores: ["nein","ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","ja","nein","nein","ja","ja","nein","ja","ja","ja","ja","nein","nein","ja","nein","ja","nein","nein","ja","ja","nein","ja","nein","nein","nein","nein","ja","nein","ja"] },
+        { id: "15", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","ja","nein","nein","nein","ja","ja","nein","ja","nein","ja","nein","ja","nein","ja","ja","ja","nein","ja","ja","nein","nein","ja","ja","ja","nein","nein","ja","nein","nein","ja","ja","ja","ja","nein","nein","ja","ja","ja","nein","ja"] },
+        { id: "16", scores: ["ja","ja","ja","nein","nein","nein","nein","nein","nein","ja","ja","nein","nein","nein","ja","ja","nein","nein","nein","nein","nein","ja","ja","nein","ja","nein","ja","ja","nein","nein","ja","nein","ja","ja","nein","ja","nein","ja","nein","nein","ja","ja","ja","nein","nein","ja","ja","ja"] },
+        { id: "17", scores: ["nein","ja","ja","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","ja","nein","nein","nein","ja","nein","ja","ja","nein","ja","nein","ja","ja","ja","nein","ja","nein","ja","ja","nein","nein","nein","ja","ja","nein","nein","ja","ja","nein","nein","ja","nein","ja"] },
         { id: "18", scores: ["nein","nein","ja","ja","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","ja","nein","nein","ja","nein","nein","ja","ja","nein","ja","nein","ja","ja","ja","ja","ja","ja","nein","ja","nein","nein","ja","nein","nein","ja","nein","nein","ja","nein","ja","nein","ja","nein"] }
     ];
 
@@ -207,11 +207,19 @@
                     content.innerHTML += `<div class="result-item-box"><span>Sie haben wahrscheinlich <strong>${displayNames}</strong> vor sich.</span></div>`;
                     content.innerHTML += `<p class="low-info">Für ein besseres Ergebnis sollten Sie versuchen, im vorherigen Dialog mehr Fragen zu beantworten.</p>`;
                 } else {
-                    content.innerHTML += `
-                        <div class="result-item-box">
-                            <span>Sie haben wahrscheinlich <strong>${displayNames}</strong> vor sich.</span>
-                            <span class="result-perc">${type}%</span>
-                        </div>`;
+                    // Falls es sich um einen Gleichstand (mehr als 1 ID) bei 100% handelt, Prozentsatz ausblenden
+                    if (ids.length > 1 && type === '100') {
+                        content.innerHTML += `
+                            <div class="result-item-box">
+                                <span>Sie haben wahrscheinlich <strong>${displayNames}</strong> vor sich.</span>
+                            </div>`;
+                    } else {
+                        content.innerHTML += `
+                            <div class="result-item-box">
+                                <span>Sie haben wahrscheinlich <strong>${displayNames}</strong> vor sich.</span>
+                                <span class="result-perc">${type}%</span>
+                            </div>`;
+                    }
                 }
 
                 const restartBtn = document.createElement('button');
@@ -281,23 +289,31 @@
             }
 
             let results = [];
-            // FILTER AKTIVIERT: Nur Arten in allowedIds einbeziehen
             matrixData.forEach(row => {
                 if (allowedIds.includes(row.id)) {
                     let score = 0;
+                    let maxPossibleScore = 0;
+                    let isSpecialSpecies = (row.id === "16" || row.id === "17" || row.id === "18");
+
                     questionGroups.forEach((group, gIdx) => {
+                        // Dynamische Ermittlung der maximalen Punktzahl für diese spezifische Art
+                        let groupHasJa = group.indices.some(idx => row.scores[idx] === 'ja');
+                        if (groupHasJa) {
+                            let weight = (gIdx === 5 || gIdx === 7) ? 2 : 1;
+                            maxPossibleScore += weight;
+                        }
+
                         const sel = document.querySelector(`input[name="g${gIdx}"]:checked`);
                         if (sel) {
                             const ansIdx = parseInt(sel.value);
                             if (row.scores[ansIdx] === 'ja') {
-                                // Gewichtung: unterstes Laubblatt (Index 5) und Stängel (Index 7) zählen doppelt
                                 let weight = (gIdx === 5 || gIdx === 7) ? 2 : 1;
                                 score += weight;
                             }
                         }
                     });
                     
-                    let percentNum = Math.round((score / 18) * 100);
+                    let percentNum = maxPossibleScore > 0 ? Math.round((score / maxPossibleScore) * 100) : 0;
                     results.push({ id: row.id, score: score, percent: percentNum });
                 }
             });
